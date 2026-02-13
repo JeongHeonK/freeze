@@ -34,7 +34,7 @@ export function useFreeze(isOpen: boolean, duration: number = DEFAULT_DURATION) 
     }
 
     return clearTimer;
-  }, [isOpen]);
+  }, [isOpen, clearTimer]);
 
   return { shouldRender, frozen };
 }
