@@ -7,7 +7,7 @@ let instanceCount = 0;
 // Suspense가 re-suspend 시 커밋된 children에 inline display:none을 적용함.
 // 이를 override하여 frozen 상태에서도 children이 화면에 보이도록 함.
 const FREEZE_STYLE =
-  '.freeze-container > [style*="display: none"] { display: block !important; }';
+  '.freeze-container [style*="display: none"] { display: block !important; }';
 
 function injectStyle(): void {
   if (typeof document === 'undefined') return;

@@ -22,14 +22,14 @@ describe('Freeze', () => {
     expect(screen.queryByTestId('child')).not.toBeInTheDocument();
   });
 
-  it('unfrozen→frozen 전환 시 children이 숨겨진다', () => {
+  it('unfrozen→frozen 전환 시 children이 DOM에 남아있다 (브라우저에서는 CSS override로 보임)', () => {
     const { rerender } = render(
       <Freeze frozen={false}>
         <div data-testid="child">Hello</div>
       </Freeze>,
     );
 
-    expect(screen.getByTestId('child')).toBeVisible();
+    expect(screen.getByTestId('child')).toBeInTheDocument();
 
     rerender(
       <Freeze frozen={true}>
@@ -37,13 +37,12 @@ describe('Freeze', () => {
       </Freeze>,
     );
 
-    // jsdom에서 Suspense는 이미 커밋된 children을 display:none으로 숨김
+    // Suspense가 re-suspend 시 children에 inline display:none을 적용함.
+    // 브라우저에서는 FREEZE_STYLE CSS가 이를 override하여 children이 보이지만,
+    // jsdom은 CSS cascade를 완전히 구현하지 않아 toBeVisible() 검증 불가.
+    // 대신 children이 DOM에 남아있는지만 확인.
     const child = screen.queryByTestId('child');
-    if (child) {
-      expect(child).not.toBeVisible();
-    } else {
-      expect(child).toBeNull();
-    }
+    expect(child).toBeInTheDocument();
   });
 
   it('frozen→unfrozen 전환 시 children이 복원된다', () => {
