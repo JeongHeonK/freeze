@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useFreeze } from './useFreeze';
 
 describe('useFreeze', () => {
@@ -21,10 +21,9 @@ describe('useFreeze', () => {
   });
 
   it('false→true 전환 시 shouldRender=true, frozen=false', () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useFreeze(isOpen),
-      { initialProps: { isOpen: false } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useFreeze(isOpen), {
+      initialProps: { isOpen: false },
+    });
 
     rerender({ isOpen: true });
 
@@ -32,10 +31,9 @@ describe('useFreeze', () => {
   });
 
   it('true→false 전환 즉시 shouldRender=true, frozen=true', () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useFreeze(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useFreeze(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     rerender({ isOpen: false });
 
@@ -43,10 +41,9 @@ describe('useFreeze', () => {
   });
 
   it('닫힘 후 기본 duration(300ms) 경과 시 shouldRender=false, frozen=false', () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useFreeze(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useFreeze(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     rerender({ isOpen: false });
 
@@ -77,10 +74,9 @@ describe('useFreeze', () => {
   });
 
   it('duration 내 재오픈 시 타임아웃을 취소한다', () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useFreeze(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useFreeze(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     rerender({ isOpen: false });
 
@@ -114,10 +110,9 @@ describe('useFreeze', () => {
   });
 
   it('빠른 open/close/open 토글을 처리한다', () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useFreeze(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useFreeze(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     // close
     rerender({ isOpen: false });
