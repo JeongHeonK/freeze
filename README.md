@@ -27,11 +27,11 @@ freeze는 두 가지 접근법을 제공합니다:
 ## Installation
 
 ```bash
-npm install freeze
+npm install @jeongheonk/freeze
 # or
-pnpm add freeze
+pnpm add @jeongheonk/freeze
 # or
-yarn add freeze
+yarn add @jeongheonk/freeze
 ```
 
 > React 18 이상이 필요합니다.
@@ -84,7 +84,7 @@ Suspense 기반으로 children의 DOM 업데이트를 완전히 차단하는 컴
 대부분의 경우 `useFreeze`만으로 충분합니다.
 
 ```tsx
-import { useFreeze } from 'freeze';
+import { useFreeze } from '@jeongheonk/freeze';
 
 function Modal({ isOpen }: { isOpen: boolean }) {
   const { shouldRender, frozen } = useFreeze(isOpen, 300);
@@ -107,7 +107,7 @@ function Modal({ isOpen }: { isOpen: boolean }) {
 DOM 업데이트를 완전히 차단해야 할 때 `Freeze` 컴포넌트를 함께 사용합니다.
 
 ```tsx
-import { Freeze, useFreeze } from 'freeze';
+import { Freeze, useFreeze } from '@jeongheonk/freeze';
 
 function Popover({ isOpen }: { isOpen: boolean }) {
   const { shouldRender, frozen } = useFreeze(isOpen, 200);

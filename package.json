@@ -1,5 +1,5 @@
 {
-  "name": "freeze",
+  "name": "@jeongheonk/freeze",
   "version": "0.1.0",
   "description": "Freeze your React components during exit animations",
   "type": "module",
@@ -41,6 +41,7 @@
     "@testing-library/react": "^16.3.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@vitest/coverage-v8": "4.0.18",
     "jsdom": "^26.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
