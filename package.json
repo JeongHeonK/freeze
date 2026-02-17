@@ -1,5 +1,5 @@
 {
-  "name": "@jeongheonk/freeze",
+  "name": "@jeonheonkim/freeze",
   "version": "0.1.0",
   "description": "Freeze your React components during exit animations",
   "type": "module",
