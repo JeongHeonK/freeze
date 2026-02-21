@@ -3,10 +3,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const DEFAULT_DURATION = 300;
 const MAX_DURATION = 10000;
 
+export interface UseFreezeOptions {
+  duration?: number;
+}
+
+export interface UseFreezeReturn {
+  shouldRender: boolean;
+  frozen: boolean;
+}
+
 export function useFreeze(
   isOpen: boolean,
   duration: number = DEFAULT_DURATION,
-) {
+): UseFreezeReturn {
   const safeDuration = Math.max(0, Math.min(duration, MAX_DURATION));
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [frozen, setFrozen] = useState(false);
