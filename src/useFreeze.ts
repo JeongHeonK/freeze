@@ -3,10 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const DEFAULT_DURATION = 300;
 const MAX_DURATION = 10000;
 
-export interface UseFreezeOptions {
-  duration?: number;
-}
-
 export interface UseFreezeReturn {
   shouldRender: boolean;
   frozen: boolean;

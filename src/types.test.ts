@@ -1,4 +1,4 @@
-import type { FreezeProps, UseFreezeOptions, UseFreezeReturn } from './index';
+import type { FreezeProps, UseFreezeReturn } from './index';
 
 describe('Type exports', () => {
   it('FreezeProps 타입이 frozen과 children을 가진다', () => {
@@ -16,12 +16,5 @@ describe('Type exports', () => {
     };
     expect(result.shouldRender).toBe(true);
     expect(result.frozen).toBe(false);
-  });
-
-  it('UseFreezeOptions 타입이 duration을 가진다', () => {
-    const options: UseFreezeOptions = {
-      duration: 500,
-    };
-    expect(options.duration).toBe(500);
   });
 });
