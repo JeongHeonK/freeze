@@ -35,13 +35,16 @@ pnpm build
 cd demo && pnpm install && pnpm dev
 ```
 
-### Without freeze (flicker)
-
-![without-freeze](./demo/assets/without-freeze.gif)
-
-### With freeze (clean)
-
-![with-freeze](./demo/assets/with-freeze.gif)
+<table>
+  <tr>
+    <th>Without freeze — flicker</th>
+    <th>With freeze — clean</th>
+  </tr>
+  <tr>
+    <td><img src="./demo/assets/without-freeze.gif" alt="without-freeze" /></td>
+    <td><img src="./demo/assets/with-freeze.gif" alt="with-freeze" /></td>
+  </tr>
+</table>
 
 ---
 

@@ -33,13 +33,16 @@ pnpm build
 cd demo && pnpm install && pnpm dev
 ```
 
-### Without freeze (깜빡임 발생)
-
-![without-freeze](./demo/assets/without-freeze.gif)
-
-### With freeze (깔끔)
-
-![with-freeze](./demo/assets/with-freeze.gif)
+<table>
+  <tr>
+    <th>Without freeze — 깜빡임 발생</th>
+    <th>With freeze — 깔끔</th>
+  </tr>
+  <tr>
+    <td><img src="./demo/assets/without-freeze.gif" alt="without-freeze" /></td>
+    <td><img src="./demo/assets/with-freeze.gif" alt="with-freeze" /></td>
+  </tr>
+</table>
 
 ---
 
