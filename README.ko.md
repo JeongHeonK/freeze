@@ -39,8 +39,8 @@ cd demo && pnpm install && pnpm dev
     <th>With freeze — 깔끔</th>
   </tr>
   <tr>
-    <td><img src="./demo/assets/without-freeze.gif" alt="without-freeze" /></td>
-    <td><img src="./demo/assets/with-freeze.gif" alt="with-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/without-freeze.gif" alt="without-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/with-freeze.gif" alt="with-freeze" /></td>
   </tr>
 </table>
 
@@ -95,7 +95,7 @@ const { shouldRender, frozen } = useFreeze(isOpen, {
 |----------|------|---------|-------------|
 | `duration` | `number` | `300` | 닫힘 애니메이션 지속 시간 (ms, 최대 10000) |
 | `onExitComplete` | `() => void` | — | 닫힘 애니메이션 완료 후 컴포넌트 언마운트 시 호출 |
-| `ref` | `RefObject<HTMLElement \| null>` | — | `transitionend` / `animationend` 자동 감지를 위한 요소 ref. 제공 시 `duration`은 무시됨 (`ref.current`가 `null`이면 `duration`으로 폴백). 이벤트 미감지 시 10초 안전 타임아웃 발동. |
+| `ref` | `RefObject<HTMLElement \| null>` | — | `transitionend` / `animationend` 자동 감지를 위한 요소 ref.<br>제공 시 `duration`은 무시됨 (`ref.current`가 `null`이면 `duration`으로 폴백).<br>이벤트 미감지 시 10초 안전 타임아웃 발동. |
 
 **Returns (`UseFreezeReturn`):**
 

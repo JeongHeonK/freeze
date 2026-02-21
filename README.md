@@ -41,8 +41,8 @@ cd demo && pnpm install && pnpm dev
     <th>With freeze — clean</th>
   </tr>
   <tr>
-    <td><img src="./demo/assets/without-freeze.gif" alt="without-freeze" /></td>
-    <td><img src="./demo/assets/with-freeze.gif" alt="with-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/without-freeze.gif" alt="without-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/with-freeze.gif" alt="with-freeze" /></td>
   </tr>
 </table>
 
@@ -97,7 +97,7 @@ const { shouldRender, frozen } = useFreeze(isOpen, {
 |----------|------|---------|-------------|
 | `duration` | `number` | `300` | Exit animation duration in ms (max 10000) |
 | `onExitComplete` | `() => void` | — | Called after exit animation finishes and the component unmounts |
-| `ref` | `RefObject<HTMLElement \| null>` | — | Element ref for auto-detecting `transitionend` / `animationend`. When provided, `duration` is ignored (falls back to `duration` if `ref.current` is `null`). A safety timeout of 10s fires if no event is detected. |
+| `ref` | `RefObject<HTMLElement \| null>` | — | Element ref for auto-detecting `transitionend` / `animationend`.<br>When provided, `duration` is ignored (falls back to `duration` if `ref.current` is `null`).<br>A safety timeout of 10s fires if no event is detected. |
 
 **Returns (`UseFreezeReturn`):**
 
