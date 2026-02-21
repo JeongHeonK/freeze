@@ -1,5 +1,10 @@
 import { type ReactNode, Suspense, useInsertionEffect } from 'react';
 
+export interface FreezeProps {
+  frozen: boolean;
+  children: ReactNode;
+}
+
 const neverResolve = new Promise<void>(() => {});
 
 let instanceCount = 0;
@@ -31,13 +36,7 @@ function Suspender(): never {
   throw neverResolve;
 }
 
-export function Freeze({
-  frozen,
-  children,
-}: {
-  frozen: boolean;
-  children: ReactNode;
-}) {
+export function Freeze({ frozen, children }: FreezeProps) {
   useInsertionEffect(() => {
     injectStyle();
     return removeStyle;
