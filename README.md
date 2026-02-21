@@ -62,12 +62,26 @@ yarn add @jeonheonkim/freeze
 
 ## API
 
-### `useFreeze(isOpen, duration?)`
+### `useFreeze(isOpen, durationOrOptions?)`
 
 Manages the render lifecycle of a component during exit animations.
 
 ```ts
-const { shouldRender, frozen } = useFreeze(isOpen, duration);
+// Simple — fixed duration
+const { shouldRender, frozen } = useFreeze(isOpen, 300);
+
+// Options object — with callback
+const { shouldRender, frozen } = useFreeze(isOpen, {
+  duration: 300,
+  onExitComplete: () => console.log('exit done'),
+});
+
+// Ref-based — auto-detect animation/transition end
+const ref = useRef<HTMLDivElement>(null);
+const { shouldRender, frozen } = useFreeze(isOpen, {
+  ref,
+  onExitComplete: () => console.log('exit done'),
+});
 ```
 
 **Parameters:**
@@ -75,9 +89,17 @@ const { shouldRender, frozen } = useFreeze(isOpen, duration);
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `isOpen` | `boolean` | — | Open/close state of the component |
-| `duration` | `number` | `300` | Exit animation duration in ms (max 10000) |
+| `durationOrOptions` | `number \| UseFreezeOptions` | `300` | Exit duration in ms, or an options object |
 
-**Returns:**
+**`UseFreezeOptions`:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `duration` | `number` | `300` | Exit animation duration in ms (max 10000) |
+| `onExitComplete` | `() => void` | — | Called after exit animation finishes and the component unmounts |
+| `ref` | `RefObject<HTMLElement \| null>` | — | Element ref for auto-detecting `transitionend` / `animationend`. When provided, `duration` is ignored (falls back to `duration` if `ref.current` is `null`). A safety timeout of 10s fires if no event is detected. |
+
+**Returns (`UseFreezeReturn`):**
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -94,12 +116,20 @@ Blocks all DOM commits to children using React Suspense.
 </Freeze>
 ```
 
-**Props:**
+**Props (`FreezeProps`):**
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `frozen` | `boolean` | When `true`, blocks DOM commits to children |
 | `children` | `ReactNode` | Content to render |
+
+### TypeScript
+
+All types are exported:
+
+```ts
+import type { FreezeProps, UseFreezeOptions, UseFreezeReturn } from '@jeonheonkim/freeze';
+```
 
 ## Usage
 
@@ -126,6 +156,58 @@ function Modal({ isOpen }: { isOpen: boolean }) {
 }
 ```
 
+### With `onExitComplete` callback
+
+Run cleanup logic after the exit animation finishes.
+
+```tsx
+import { useFreeze } from '@jeonheonkim/freeze';
+
+function Drawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { shouldRender, frozen } = useFreeze(isOpen, {
+    duration: 400,
+    onExitComplete: () => onClose(),
+  });
+
+  if (!shouldRender) return null;
+
+  return (
+    <div
+      className={isOpen ? 'drawer-enter' : 'drawer-exit'}
+      style={{ pointerEvents: frozen ? 'none' : 'auto' }}
+    >
+      <p>Drawer Content</p>
+    </div>
+  );
+}
+```
+
+### Ref-based event detection
+
+Let the browser tell you when the CSS animation/transition ends — no need to hardcode `duration`.
+
+```tsx
+import { useRef } from 'react';
+import { useFreeze } from '@jeonheonkim/freeze';
+
+function Tooltip({ isOpen }: { isOpen: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { shouldRender, frozen } = useFreeze(isOpen, { ref });
+
+  if (!shouldRender) return null;
+
+  return (
+    <div
+      ref={ref}
+      className={isOpen ? 'tooltip-enter' : 'tooltip-exit'}
+      style={{ pointerEvents: frozen ? 'none' : 'auto' }}
+    >
+      <p>Tooltip Content</p>
+    </div>
+  );
+}
+```
+
 ### Suspense-based (useFreeze + Freeze)
 
 Use the `Freeze` component when you need to completely block DOM updates.
@@ -134,7 +216,7 @@ Use the `Freeze` component when you need to completely block DOM updates.
 import { Freeze, useFreeze } from '@jeonheonkim/freeze';
 
 function Popover({ isOpen }: { isOpen: boolean }) {
-  const { shouldRender, frozen } = useFreeze(isOpen, 200);
+  const { shouldRender, frozen } = useFreeze(isOpen, { duration: 200 });
 
   if (!shouldRender) return null;
 
