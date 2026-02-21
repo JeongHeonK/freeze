@@ -1,27 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Freeze, useFreeze } from "@jeonheonkim/freeze";
 
 export default function WithFreeze() {
   const [isOpen, setIsOpen] = useState(false);
   const [count, setCount] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // 400ms: 닫힘 애니메이션(fadeOut 0.4s)과 일치
   const { shouldRender, frozen } = useFreeze(isOpen, 400);
 
-  // 팝오버가 열려 있는 동안 0.1초마다 카운터 증가
   useEffect(() => {
-    if (isOpen) {
-      setCount(0);
-      intervalRef.current = setInterval(() => {
-        setCount((c) => c + 1);
-      }, 100);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    if (!isOpen) return;
+
+    setCount(0);
+    const id = setInterval(() => setCount((c) => c + 1), 100);
+    return () => clearInterval(id);
   }, [isOpen]);
 
   return (

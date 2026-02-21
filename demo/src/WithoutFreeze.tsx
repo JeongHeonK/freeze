@@ -4,22 +4,14 @@ export default function WithoutFreeze() {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [count, setCount] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 팝오버가 열려 있는 동안 0.1초마다 카운터 증가 (닫히는 중에도 계속 올라감)
   useEffect(() => {
-    if (isOpen) {
-      setCount(0);
-      intervalRef.current = setInterval(() => {
-        setCount((c) => c + 1);
-      }, 100);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    if (!isOpen) return;
+
+    setCount(0);
+    const id = setInterval(() => setCount((c) => c + 1), 100);
+    return () => clearInterval(id);
   }, [isOpen]);
 
   const handleClose = () => {
