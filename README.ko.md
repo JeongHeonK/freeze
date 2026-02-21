@@ -39,8 +39,8 @@ cd demo && pnpm install && pnpm dev
     <th>With freeze — 깔끔</th>
   </tr>
   <tr>
-    <td><img src="./demo/assets/without-freeze.gif" alt="without-freeze" /></td>
-    <td><img src="./demo/assets/with-freeze.gif" alt="with-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/without-freeze.gif" alt="without-freeze" /></td>
+    <td><img src="https://raw.githubusercontent.com/JeongHeonK/freeze/main/demo/assets/with-freeze.gif" alt="with-freeze" /></td>
   </tr>
 </table>
 
@@ -60,12 +60,26 @@ yarn add @jeonheonkim/freeze
 
 ## API
 
-### `useFreeze(isOpen, duration?)`
+### `useFreeze(isOpen, durationOrOptions?)`
 
 컴포넌트의 렌더 라이프사이클을 관리하는 hook.
 
 ```ts
-const { shouldRender, frozen } = useFreeze(isOpen, duration);
+// 간단한 사용 — 고정 duration
+const { shouldRender, frozen } = useFreeze(isOpen, 300);
+
+// options 객체 — 콜백 포함
+const { shouldRender, frozen } = useFreeze(isOpen, {
+  duration: 300,
+  onExitComplete: () => console.log('exit done'),
+});
+
+// ref 기반 — animation/transition 종료 자동 감지
+const ref = useRef<HTMLDivElement>(null);
+const { shouldRender, frozen } = useFreeze(isOpen, {
+  ref,
+  onExitComplete: () => console.log('exit done'),
+});
 ```
 
 **Parameters:**
@@ -73,9 +87,17 @@ const { shouldRender, frozen } = useFreeze(isOpen, duration);
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `isOpen` | `boolean` | — | 컴포넌트의 열림/닫힘 상태 |
-| `duration` | `number` | `300` | 닫힘 애니메이션 지속 시간 (ms, 최대 10000) |
+| `durationOrOptions` | `number \| UseFreezeOptions` | `300` | 닫힘 애니메이션 지속 시간(ms) 또는 options 객체 |
 
-**Returns:**
+**`UseFreezeOptions`:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `duration` | `number` | `300` | 닫힘 애니메이션 지속 시간 (ms, 최대 10000) |
+| `onExitComplete` | `() => void` | — | 닫힘 애니메이션 완료 후 컴포넌트 언마운트 시 호출 |
+| `ref` | `RefObject<HTMLElement \| null>` | — | `transitionend` / `animationend` 자동 감지를 위한 요소 ref.<br>제공 시 `duration`은 무시됨 (`ref.current`가 `null`이면 `duration`으로 폴백).<br>이벤트 미감지 시 10초 안전 타임아웃 발동. |
+
+**Returns (`UseFreezeReturn`):**
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -92,12 +114,20 @@ Suspense 기반으로 children의 DOM 업데이트를 완전히 차단하는 컴
 </Freeze>
 ```
 
-**Props:**
+**Props (`FreezeProps`):**
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `frozen` | `boolean` | `true`이면 children의 DOM 커밋을 차단 |
 | `children` | `ReactNode` | 렌더링할 자식 요소 |
+
+### TypeScript
+
+모든 타입이 export됩니다:
+
+```ts
+import type { FreezeProps, UseFreezeOptions, UseFreezeReturn } from '@jeonheonkim/freeze';
+```
 
 ## Usage
 
@@ -124,6 +154,58 @@ function Modal({ isOpen }: { isOpen: boolean }) {
 }
 ```
 
+### `onExitComplete` 콜백
+
+닫힘 애니메이션 완료 후 정리 로직을 실행합니다.
+
+```tsx
+import { useFreeze } from '@jeonheonkim/freeze';
+
+function Drawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { shouldRender, frozen } = useFreeze(isOpen, {
+    duration: 400,
+    onExitComplete: () => onClose(),
+  });
+
+  if (!shouldRender) return null;
+
+  return (
+    <div
+      className={isOpen ? 'drawer-enter' : 'drawer-exit'}
+      style={{ pointerEvents: frozen ? 'none' : 'auto' }}
+    >
+      <p>Drawer Content</p>
+    </div>
+  );
+}
+```
+
+### ref 기반 이벤트 감지
+
+CSS animation/transition 종료를 브라우저가 알려줍니다 — `duration`을 하드코딩할 필요가 없습니다.
+
+```tsx
+import { useRef } from 'react';
+import { useFreeze } from '@jeonheonkim/freeze';
+
+function Tooltip({ isOpen }: { isOpen: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { shouldRender, frozen } = useFreeze(isOpen, { ref });
+
+  if (!shouldRender) return null;
+
+  return (
+    <div
+      ref={ref}
+      className={isOpen ? 'tooltip-enter' : 'tooltip-exit'}
+      style={{ pointerEvents: frozen ? 'none' : 'auto' }}
+    >
+      <p>Tooltip Content</p>
+    </div>
+  );
+}
+```
+
 ### Suspense 기반 (useFreeze + Freeze 조합)
 
 DOM 업데이트를 완전히 차단해야 할 때 `Freeze` 컴포넌트를 함께 사용합니다.
@@ -132,7 +214,7 @@ DOM 업데이트를 완전히 차단해야 할 때 `Freeze` 컴포넌트를 함�
 import { Freeze, useFreeze } from '@jeonheonkim/freeze';
 
 function Popover({ isOpen }: { isOpen: boolean }) {
-  const { shouldRender, frozen } = useFreeze(isOpen, 200);
+  const { shouldRender, frozen } = useFreeze(isOpen, { duration: 200 });
 
   if (!shouldRender) return null;
 
