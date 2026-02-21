@@ -12,6 +12,7 @@ export default function WithFreeze() {
   // 팝오버가 열려 있는 동안 0.1초마다 카운터 증가
   useEffect(() => {
     if (isOpen) {
+      setCount(0);
       intervalRef.current = setInterval(() => {
         setCount((c) => c + 1);
       }, 100);
@@ -33,15 +34,9 @@ export default function WithFreeze() {
         <Freeze frozen={frozen}>
           <div className={`popover ${frozen ? "popover--closing" : "popover--bad"}`}>
             <p className="popover-title">Counter (100ms)</p>
-            {/* frozen=true 동안 Suspense가 DOM 커밋을 막아 카운터 고정 */}
+            {/* frozen=true 동안 Suspense가 DOM 커밋을 막아 닫기 클릭 시점 값으로 고정 */}
             <div className="counter-display">{count}</div>
-            <button
-              className="close-btn"
-              onClick={() => {
-                setCount(0);
-                setIsOpen(false);
-              }}
-            >
+            <button className="close-btn" onClick={() => setIsOpen(false)}>
               닫기
             </button>
           </div>
