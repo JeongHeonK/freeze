@@ -2,6 +2,30 @@
   "name": "@jeonheonkim/freeze",
   "version": "0.1.0",
   "description": "Freeze your React components during exit animations",
+  "keywords": [
+    "react",
+    "animation",
+    "exit-animation",
+    "freeze",
+    "hook",
+    "suspense",
+    "modal",
+    "transition",
+    "unmount",
+    "popover",
+    "drawer",
+    "react-hook",
+    "framer-motion",
+    "css-animation"
+  ],
+  "homepage": "https://github.com/JeongHeonK/freeze#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JeongHeonK/freeze.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JeongHeonK/freeze/issues"
+  },
   "type": "module",
   "exports": {
     ".": {
