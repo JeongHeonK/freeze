@@ -270,3 +270,143 @@ describe('useFreeze - onExitComplete', () => {
     expect(callback2).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useFreeze - ref 기반 이벤트 감지', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('transitionend 이벤트로 언마운트한다', () => {
+    const el = document.createElement('div');
+    const ref = { current: el };
+    const onExitComplete = vi.fn();
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref, onExitComplete }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+    expect(result.current).toEqual({ shouldRender: true, frozen: true });
+
+    act(() => {
+      el.dispatchEvent(new Event('transitionend'));
+    });
+
+    expect(result.current).toEqual({ shouldRender: false, frozen: false });
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('animationend 이벤트로 언마운트한다', () => {
+    const el = document.createElement('div');
+    const ref = { current: el };
+    const onExitComplete = vi.fn();
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref, onExitComplete }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+
+    act(() => {
+      el.dispatchEvent(new Event('animationend'));
+    });
+
+    expect(result.current).toEqual({ shouldRender: false, frozen: false });
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('이벤트 미발생 시 MAX_DURATION 후 안전 언마운트한다', () => {
+    const el = document.createElement('div');
+    const ref = { current: el };
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+    expect(result.current).toEqual({ shouldRender: true, frozen: true });
+
+    // MAX_DURATION(10000ms) 전에는 여전히 frozen
+    act(() => {
+      vi.advanceTimersByTime(9999);
+    });
+    expect(result.current).toEqual({ shouldRender: true, frozen: true });
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(result.current).toEqual({ shouldRender: false, frozen: false });
+  });
+
+  it('재오픈 시 이벤트 리스너를 정리한다', () => {
+    const el = document.createElement('div');
+    const ref = { current: el };
+    const onExitComplete = vi.fn();
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref, onExitComplete }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+
+    // 재오픈
+    rerender({ isOpen: true });
+    expect(result.current).toEqual({ shouldRender: true, frozen: false });
+
+    // 이전 리스너의 이벤트가 발생해도 상태 변경 없어야 함
+    act(() => {
+      el.dispatchEvent(new Event('transitionend'));
+    });
+    expect(result.current).toEqual({ shouldRender: true, frozen: false });
+    expect(onExitComplete).not.toHaveBeenCalled();
+  });
+
+  it('ref.current가 null이면 duration 폴백한다', () => {
+    const ref = { current: null };
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref, duration: 200 }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+    expect(result.current).toEqual({ shouldRender: true, frozen: true });
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(result.current).toEqual({ shouldRender: false, frozen: false });
+  });
+
+  it('duration과 ref 동시 제공 시 ref를 우선한다', () => {
+    const el = document.createElement('div');
+    const ref = { current: el };
+
+    const { result, rerender } = renderHook(
+      ({ isOpen }) => useFreeze(isOpen, { ref, duration: 100 }),
+      { initialProps: { isOpen: true } },
+    );
+
+    rerender({ isOpen: false });
+
+    // duration(100ms)이 지나도 ref 모드이므로 여전히 frozen
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(result.current).toEqual({ shouldRender: true, frozen: true });
+
+    // 이벤트로 언마운트
+    act(() => {
+      el.dispatchEvent(new Event('transitionend'));
+    });
+    expect(result.current).toEqual({ shouldRender: false, frozen: false });
+  });
+});
