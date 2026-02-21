@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 const DEFAULT_DURATION = 300;
 const MAX_DURATION = 10000;
@@ -6,6 +12,7 @@ const MAX_DURATION = 10000;
 export interface UseFreezeOptions {
   duration?: number;
   onExitComplete?: () => void;
+  ref?: RefObject<HTMLElement | null>;
 }
 
 export interface UseFreezeReturn {
@@ -28,6 +35,8 @@ export function useFreeze(
     ? durationOrOptions.onExitComplete
     : undefined;
 
+  const elementRef = isOptions ? durationOrOptions.ref : undefined;
+
   const safeDuration = Math.max(0, Math.min(duration, MAX_DURATION));
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [frozen, setFrozen] = useState(false);
@@ -44,27 +53,61 @@ export function useFreeze(
     }
   }, []);
 
+  const scheduleRefExit = (el: HTMLElement) => {
+    let settled = false;
+
+    const handleEnd = () => {
+      if (settled) return;
+      settled = true;
+      clearTimer();
+      el.removeEventListener('transitionend', handleEnd);
+      el.removeEventListener('animationend', handleEnd);
+      setShouldRender(false);
+      setFrozen(false);
+      onExitCompleteRef.current?.();
+    };
+
+    el.addEventListener('transitionend', handleEnd);
+    el.addEventListener('animationend', handleEnd);
+    timeoutRef.current = setTimeout(handleEnd, MAX_DURATION);
+
+    return () => {
+      settled = true;
+      clearTimer();
+      el.removeEventListener('transitionend', handleEnd);
+      el.removeEventListener('animationend', handleEnd);
+    };
+  };
+
+  const scheduleDurationExit = () => {
+    timeoutRef.current = setTimeout(() => {
+      setShouldRender(false);
+      setFrozen(false);
+      timeoutRef.current = undefined;
+      onExitCompleteRef.current?.();
+    }, safeDuration);
+    return clearTimer;
+  };
+
   // biome-ignore lint/correctness/useExhaustiveDependencies(shouldRender): adding causes infinite loop — effect sets shouldRender
-  // biome-ignore lint/correctness/useExhaustiveDependencies(safeDuration): derived from props on each render, adding causes unnecessary timer resets
+  // biome-ignore lint/correctness/useExhaustiveDependencies(elementRef?.current): ref.current changes don't require effect re-run; listeners are bound on close transition
+  // biome-ignore lint/correctness/useExhaustiveDependencies(scheduleRefExit): stable closure recreated per render, not a dependency
+  // biome-ignore lint/correctness/useExhaustiveDependencies(scheduleDurationExit): stable closure recreated per render, not a dependency
   useEffect(() => {
     if (isOpen) {
-      // 열림: 타이머 취소, frozen 해제, 렌더링 보장
       clearTimer();
       setShouldRender(true);
       setFrozen(false);
-    } else if (shouldRender) {
-      // 닫힘: frozen 상태로 전환, duration 후 언마운트
-      setFrozen(true);
-      clearTimer();
-      timeoutRef.current = setTimeout(() => {
-        setShouldRender(false);
-        setFrozen(false);
-        timeoutRef.current = undefined;
-        onExitCompleteRef.current?.();
-      }, safeDuration);
+      return clearTimer;
     }
 
-    return clearTimer;
+    if (!shouldRender) return clearTimer;
+
+    setFrozen(true);
+    clearTimer();
+
+    const el = elementRef?.current;
+    return el ? scheduleRefExit(el) : scheduleDurationExit();
   }, [isOpen, clearTimer]);
 
   return { shouldRender, frozen };
