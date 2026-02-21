@@ -53,9 +53,46 @@ export function useFreeze(
     }
   }, []);
 
+  const scheduleRefExit = (el: HTMLElement) => {
+    let settled = false;
+
+    const handleEnd = () => {
+      if (settled) return;
+      settled = true;
+      clearTimer();
+      el.removeEventListener('transitionend', handleEnd);
+      el.removeEventListener('animationend', handleEnd);
+      setShouldRender(false);
+      setFrozen(false);
+      onExitCompleteRef.current?.();
+    };
+
+    el.addEventListener('transitionend', handleEnd);
+    el.addEventListener('animationend', handleEnd);
+    timeoutRef.current = setTimeout(handleEnd, MAX_DURATION);
+
+    return () => {
+      settled = true;
+      clearTimer();
+      el.removeEventListener('transitionend', handleEnd);
+      el.removeEventListener('animationend', handleEnd);
+    };
+  };
+
+  const scheduleDurationExit = () => {
+    timeoutRef.current = setTimeout(() => {
+      setShouldRender(false);
+      setFrozen(false);
+      timeoutRef.current = undefined;
+      onExitCompleteRef.current?.();
+    }, safeDuration);
+    return clearTimer;
+  };
+
   // biome-ignore lint/correctness/useExhaustiveDependencies(shouldRender): adding causes infinite loop — effect sets shouldRender
-  // biome-ignore lint/correctness/useExhaustiveDependencies(safeDuration): derived from props on each render, adding causes unnecessary timer resets
   // biome-ignore lint/correctness/useExhaustiveDependencies(elementRef?.current): ref.current changes don't require effect re-run; listeners are bound on close transition
+  // biome-ignore lint/correctness/useExhaustiveDependencies(scheduleRefExit): stable closure recreated per render, not a dependency
+  // biome-ignore lint/correctness/useExhaustiveDependencies(scheduleDurationExit): stable closure recreated per render, not a dependency
   useEffect(() => {
     if (isOpen) {
       clearTimer();
@@ -64,54 +101,13 @@ export function useFreeze(
       return clearTimer;
     }
 
-    if (!shouldRender) {
-      return clearTimer;
-    }
+    if (!shouldRender) return clearTimer;
 
-    // 닫힘: frozen 상태로 전환
     setFrozen(true);
     clearTimer();
 
     const el = elementRef?.current;
-
-    if (el) {
-      // ref 모드: animationend/transitionend 이벤트 감지
-      let settled = false;
-
-      const handleEnd = () => {
-        if (settled) return;
-        settled = true;
-        clearTimer();
-        el.removeEventListener('transitionend', handleEnd);
-        el.removeEventListener('animationend', handleEnd);
-        setShouldRender(false);
-        setFrozen(false);
-        onExitCompleteRef.current?.();
-      };
-
-      el.addEventListener('transitionend', handleEnd);
-      el.addEventListener('animationend', handleEnd);
-
-      // 안전 타임아웃: 이벤트 미발생 대비
-      timeoutRef.current = setTimeout(handleEnd, MAX_DURATION);
-
-      return () => {
-        settled = true;
-        clearTimer();
-        el.removeEventListener('transitionend', handleEnd);
-        el.removeEventListener('animationend', handleEnd);
-      };
-    }
-
-    // duration 모드 (ref 없거나 ref.current === null)
-    timeoutRef.current = setTimeout(() => {
-      setShouldRender(false);
-      setFrozen(false);
-      timeoutRef.current = undefined;
-      onExitCompleteRef.current?.();
-    }, safeDuration);
-
-    return clearTimer;
+    return el ? scheduleRefExit(el) : scheduleDurationExit();
   }, [isOpen, clearTimer]);
 
   return { shouldRender, frozen };
