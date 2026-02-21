@@ -1,0 +1,213 @@
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.pkg {
+  color: #7dd3fc;
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.subtitle {
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0 32px;
+  align-items: start;
+}
+
+.divider {
+  background: #2a2a2a;
+  align-self: stretch;
+}
+
+.column {
+  padding: 8px;
+}
+
+.column-header {
+  margin-bottom: 32px;
+}
+
+.column-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin: 8px 0 6px;
+}
+
+.column-desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge--bad {
+  background: #3f1515;
+  color: #f87171;
+  border: 1px solid #7f1d1d;
+}
+
+.badge--good {
+  background: #14291f;
+  color: #4ade80;
+  border: 1px solid #166534;
+}
+
+/* Popover trigger area */
+.demo-area {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  position: relative;
+}
+
+/* Trigger button */
+.trigger-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.trigger-btn:hover {
+  background: #374151;
+}
+
+/* Popover */
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background: #1c1c1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.popover-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.counter-display {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #f0f0f0;
+  margin-bottom: 16px;
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.close-btn {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #111827;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.close-btn:hover {
+  background: #1f2937;
+  color: #f0f0f0;
+}
+
+/* Without freeze: instant unmount */
+.popover--bad {
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* With freeze: fade-out on close */
+.popover--closing {
+  animation: fadeOut 0.4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+}
+
+/* Note label */
+.note {
+  margin-top: 80px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.note strong {
+  color: #f87171;
+}
+
+@media (max-width: 600px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .divider {
+    height: 1px;
+    width: 100%;
+    margin: 32px 0;
+  }
+}
