@@ -17,15 +17,16 @@ export function useFreeze(
   isOpen: boolean,
   durationOrOptions?: number | UseFreezeOptions,
 ): UseFreezeReturn {
-  const duration =
-    typeof durationOrOptions === 'object'
-      ? (durationOrOptions.duration ?? DEFAULT_DURATION)
-      : (durationOrOptions ?? DEFAULT_DURATION);
+  const isOptions =
+    typeof durationOrOptions === 'object' && durationOrOptions !== null;
 
-  const onExitComplete =
-    typeof durationOrOptions === 'object'
-      ? durationOrOptions.onExitComplete
-      : undefined;
+  const duration = isOptions
+    ? (durationOrOptions.duration ?? DEFAULT_DURATION)
+    : (durationOrOptions ?? DEFAULT_DURATION);
+
+  const onExitComplete = isOptions
+    ? durationOrOptions.onExitComplete
+    : undefined;
 
   const safeDuration = Math.max(0, Math.min(duration, MAX_DURATION));
   const [shouldRender, setShouldRender] = useState(isOpen);
