@@ -3,6 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const DEFAULT_DURATION = 300;
 const MAX_DURATION = 10000;
 
+export interface UseFreezeOptions {
+  duration?: number;
+  onExitComplete?: () => void;
+}
+
 export interface UseFreezeReturn {
   shouldRender: boolean;
   frozen: boolean;
@@ -10,14 +15,27 @@ export interface UseFreezeReturn {
 
 export function useFreeze(
   isOpen: boolean,
-  duration: number = DEFAULT_DURATION,
+  durationOrOptions?: number | UseFreezeOptions,
 ): UseFreezeReturn {
+  const isOptions =
+    typeof durationOrOptions === 'object' && durationOrOptions !== null;
+
+  const duration = isOptions
+    ? (durationOrOptions.duration ?? DEFAULT_DURATION)
+    : (durationOrOptions ?? DEFAULT_DURATION);
+
+  const onExitComplete = isOptions
+    ? durationOrOptions.onExitComplete
+    : undefined;
+
   const safeDuration = Math.max(0, Math.min(duration, MAX_DURATION));
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [frozen, setFrozen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  const onExitCompleteRef = useRef(onExitComplete);
+  onExitCompleteRef.current = onExitComplete;
 
   const clearTimer = useCallback(() => {
     if (timeoutRef.current !== undefined) {
@@ -42,6 +60,7 @@ export function useFreeze(
         setShouldRender(false);
         setFrozen(false);
         timeoutRef.current = undefined;
+        onExitCompleteRef.current?.();
       }, safeDuration);
     }
 
