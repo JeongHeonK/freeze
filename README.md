@@ -4,6 +4,8 @@
 
 A React library that prevents content from changing inside components while they are animating out.
 
+**~1.2 kB** gzipped · Zero dependencies · framer-motion is ~50 kB
+
 [한국어](./README.ko.md)
 
 ## Inspiration

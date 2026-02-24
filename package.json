@@ -12,11 +12,15 @@
     "modal",
     "transition",
     "unmount",
+    "unmount-animation",
+    "exit-transition",
     "popover",
     "drawer",
     "react-hook",
     "framer-motion",
-    "css-animation"
+    "css-animation",
+    "lightweight",
+    "zero-dependency"
   ],
   "homepage": "https://github.com/JeongHeonK/freeze#readme",
   "repository": {
